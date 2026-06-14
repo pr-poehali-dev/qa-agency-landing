@@ -37,7 +37,10 @@ interface ChatMessage {
 
 export default function Index() {
   const [tasks, setTasks] = useState(5);
-  const totalEarn = tasks * 800;
+  // Экспоненциальный рост: 800₽ за 1 задание → ~45 000₽ за 30
+  const calcEarn = (n: number) => Math.round(800 * Math.pow(n, 1.85) / 10) * 10;
+  const totalEarn = calcEarn(tasks);
+  const earnPerTask = Math.round(totalEarn / tasks);
 
   const [form, setForm] = useState({ name: "", age: "", city: "" });
   const [formSent, setFormSent] = useState(false);
@@ -326,7 +329,7 @@ export default function Index() {
               </div>
               <div className="text-slate-500 font-ibm text-xs">
                 {tasks}{" "}
-                {tasks === 1 ? "задание" : tasks < 5 ? "задания" : "заданий"} × 800 ₽
+                {tasks === 1 ? "задание" : tasks < 5 ? "задания" : "заданий"} × ~{earnPerTask.toLocaleString("ru-RU")} ₽ за задание
               </div>
             </div>
 

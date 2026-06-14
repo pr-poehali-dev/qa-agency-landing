@@ -100,7 +100,7 @@ export default function Index() {
         </div>
         <div className="flex items-center gap-2">
           <span className="badge-qa px-3 py-1 rounded-full hidden sm:block">
-            Официальный набор 2024
+            Официальный набор 2026
           </span>
           <a href="#apply" className="neon-btn px-4 py-2 rounded-xl text-sm text-white font-golos font-bold">
             Пройти отбор
@@ -523,7 +523,7 @@ export default function Index() {
             чтобы забрать ТЗ.
           </p>
           <a
-            href="https://t.me/qa_agency_curator"
+            href="https://t.me/lizonkaz"
             target="_blank"
             rel="noopener noreferrer"
             className="neon-btn inline-flex items-center gap-3 px-10 py-5 rounded-2xl text-white text-xl font-golos font-bold animate-pulse-neon"
@@ -564,7 +564,7 @@ export default function Index() {
             <span className="font-golos font-bold text-white text-sm">QA-Agency</span>
           </div>
           <p className="text-slate-600 font-ibm text-xs text-center">
-            © 2024 QA-Agency · Независимое агентство контроля качества · Только 14+
+            © 2026 QA-Agency · Независимое агентство контроля качества · Только 14+
           </p>
           <div className="badge-qa px-3 py-1 rounded-full text-xs">Официальный набор</div>
         </div>

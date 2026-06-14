@@ -37,10 +37,21 @@ interface ChatMessage {
 
 export default function Index() {
   const [tasks, setTasks] = useState(5);
-  // Экспоненциальный рост: 800₽ за 1 задание → ~45 000₽ за 30
-  const calcEarn = (n: number) => Math.round(800 * Math.pow(n, 1.85) / 10) * 10;
+  // Экспоненциальный рост: 1 задание = 800₽, 30 заданий ≈ 47 000₽
+  // Формула: base * n^exp, подобрано: 800 * (n/1)^2.15, калибровка через коэф
+  const calcEarn = (n: number) => {
+    const raw = 800 * Math.pow(n, 2.15);
+    return Math.round(raw / 100) * 100;
+  };
   const totalEarn = calcEarn(tasks);
   const earnPerTask = Math.round(totalEarn / tasks);
+
+  const getLevel = (n: number) => {
+    if (n <= 5)  return { label: "Новичок",     color: "#64748b", icon: "Sprout" };
+    if (n <= 15) return { label: "Продвинутый", color: "#3b82f6", icon: "Zap" };
+    return             { label: "Эксперт",      color: "#a78bfa", icon: "Star" };
+  };
+  const level = getLevel(tasks);
 
   const [form, setForm] = useState({ name: "", age: "", city: "" });
   const [formSent, setFormSent] = useState(false);
@@ -336,7 +347,16 @@ export default function Index() {
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-slate-400 font-ibm text-sm">Заданий в месяц</span>
-                <span className="font-golos font-bold text-white text-xl">{tasks}</span>
+                <div className="flex items-center gap-2">
+                  <div
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-ibm font-semibold transition-all duration-300"
+                    style={{ background: `${level.color}18`, border: `1px solid ${level.color}40`, color: level.color }}
+                  >
+                    <Icon name={level.icon as Parameters<typeof Icon>[0]["name"]} size={11} />
+                    {level.label}
+                  </div>
+                  <span className="font-golos font-bold text-white text-xl">{tasks}</span>
+                </div>
               </div>
               <input
                 type="range"
@@ -348,8 +368,8 @@ export default function Index() {
                 style={{ "--progress": `${sliderProgress}%` } as React.CSSProperties}
               />
               <div className="flex justify-between mt-2">
-                <span className="text-slate-600 font-ibm text-xs">1</span>
-                <span className="text-slate-600 font-ibm text-xs">30</span>
+                <span className="text-slate-600 font-ibm text-xs">1 — Новичок</span>
+                <span className="text-slate-600 font-ibm text-xs">Эксперт — 30</span>
               </div>
             </div>
 
@@ -382,6 +402,122 @@ export default function Index() {
               className="neon-btn w-full py-4 rounded-2xl text-white text-center block font-golos font-bold text-base"
             >
               Хочу зарабатывать {totalEarn.toLocaleString("ru-RU")} ₽
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* ── REFERRAL ── */}
+      <section id="referral" className="relative z-10 py-24 px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <div className="badge-qa inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6">
+              <Icon name="GitBranch" size={12} className="text-blue-400" />
+              Карьерный рост
+            </div>
+            <h2 className="section-title text-3xl sm:text-4xl md:text-5xl text-white mb-4">
+              Многоуровневая <span className="neon-text">система дохода</span>
+            </h2>
+            <p className="text-slate-500 font-ibm max-w-xl mx-auto">
+              Выполняй задания, приглашай участников и получай процент с каждого их теста — пассивно.
+            </p>
+          </div>
+
+          {/* Pyramid levels */}
+          <div className="space-y-4 mb-12">
+            {[
+              {
+                tier: "Уровень 1",
+                icon: "Sprout",
+                color: "#64748b",
+                title: "Тестировщик",
+                desc: "Выполняешь задания от банков-партнёров. Доход растёт с каждым заданием.",
+                earn: "800 – 3 000 ₽ / задание",
+                cond: "С первого дня",
+              },
+              {
+                tier: "Уровень 2",
+                icon: "Zap",
+                color: "#3b82f6",
+                title: "Старший тестировщик",
+                desc: "После 5 выполненных заданий открывается доступ к реферальной ссылке. Приглашай друзей и получай 15% с каждого их задания.",
+                earn: "+15% от заданий рефералов",
+                cond: "После 5 заданий",
+              },
+              {
+                tier: "Уровень 3",
+                icon: "Star",
+                color: "#a78bfa",
+                title: "Куратор",
+                desc: "Имея 3+ активных реферала, ты становишься куратором. Получаешь приоритетные задания, повышенные ставки и 10% от заданий рефералов 2-го круга.",
+                earn: "+10% от рефералов рефералов",
+                cond: "3+ активных реферала",
+              },
+              {
+                tier: "Уровень 4",
+                icon: "Crown",
+                color: "#f59e0b",
+                title: "Региональный лид",
+                desc: "Топ-кураторы получают статус Регионального лида с фиксированной надбавкой, эксклюзивными заданиями и персональным менеджером.",
+                earn: "Фикс + % со всей сети",
+                cond: "По приглашению агентства",
+              },
+            ].map((lvl, i) => (
+              <div
+                key={lvl.tier}
+                className="glass-card rounded-2xl p-6 flex items-start gap-5"
+                style={{ borderLeft: `3px solid ${lvl.color}40` }}
+              >
+                <div
+                  className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: `${lvl.color}15`, border: `1px solid ${lvl.color}35`, boxShadow: `0 0 12px ${lvl.color}20` }}
+                >
+                  <Icon name={lvl.icon as Parameters<typeof Icon>[0]["name"]} size={20} style={{ color: lvl.color }} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
+                    <span className="text-xs font-ibm font-semibold px-2 py-0.5 rounded-full" style={{ background: `${lvl.color}15`, color: lvl.color }}>{lvl.tier}</span>
+                    <h3 className="text-white font-golos font-bold text-lg">{lvl.title}</h3>
+                  </div>
+                  <p className="text-slate-400 font-ibm text-sm leading-relaxed mb-3">{lvl.desc}</p>
+                  <div className="flex flex-wrap gap-3">
+                    <span className="flex items-center gap-1.5 text-xs font-ibm" style={{ color: lvl.color }}>
+                      <Icon name="TrendingUp" size={12} />
+                      {lvl.earn}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs font-ibm text-slate-500">
+                      <Icon name="Lock" size={12} />
+                      {lvl.cond}
+                    </span>
+                  </div>
+                </div>
+                <div
+                  className="hidden sm:flex items-center justify-center w-8 h-8 rounded-full flex-shrink-0 font-golos font-black text-lg"
+                  style={{ background: `${lvl.color}10`, color: `${lvl.color}80` }}
+                >
+                  {i + 1}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA inline */}
+          <div
+            className="rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left"
+            style={{ background: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.15)" }}
+          >
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #2563eb, #7c3aed)", boxShadow: "0 0 20px rgba(59,130,246,0.3)" }}
+            >
+              <Icon name="Network" size={24} className="text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-white font-golos font-bold text-lg mb-1">Начни строить свою сеть</h3>
+              <p className="text-slate-400 font-ibm text-sm">Реферальная ссылка открывается автоматически после 5-го задания. Никаких заявок — просто выполняй работу.</p>
+            </div>
+            <a href="#apply" className="neon-btn px-6 py-3 rounded-xl text-white font-golos font-bold text-sm whitespace-nowrap">
+              Начать сейчас
             </a>
           </div>
         </div>

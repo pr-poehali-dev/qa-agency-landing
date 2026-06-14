@@ -37,10 +37,12 @@ interface ChatMessage {
 
 export default function Index() {
   const [tasks, setTasks] = useState(5);
-  // Экспоненциальный рост: 1 задание = 800₽, 30 заданий ≈ 47 000₽
-  // Формула: base * n^exp, подобрано: 800 * (n/1)^2.15, калибровка через коэф
+  // Интерполяция: min=800₽ при n=1, max=47500₽ при n=30
   const calcEarn = (n: number) => {
-    const raw = 800 * Math.pow(n, 2.15);
+    const min = 800;
+    const max = 47500;
+    const t = (n - 1) / (30 - 1); // 0..1
+    const raw = min + (max - min) * Math.pow(t, 1.8); // ускорение к концу
     return Math.round(raw / 100) * 100;
   };
   const totalEarn = calcEarn(tasks);
@@ -135,7 +137,7 @@ export default function Index() {
         <div className="relative z-10 max-w-3xl mx-auto">
           <div className="badge-qa inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 animate-fade-up">
             <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-            Набор открыт · Строго 14+
+            Набор открыт · Свободный график
           </div>
 
           <h1
@@ -147,7 +149,7 @@ export default function Index() {
           </h1>
 
           <p className="text-slate-400 text-lg sm:text-xl leading-relaxed max-w-2xl mx-auto mb-10 animate-fade-up delay-200 font-ibm">
-            QA-Agency проводит набор тестировщиков молодёжных продуктов от ТОП-банков РФ.
+            QA-Agency проводит набор тестировщиков банковских продуктов от ТОП-банков РФ.
             Проверяй работу курьеров, тестируй приложения и получай за это официальные бонусы.{" "}
             <span className="text-slate-300">Свободный график, без опыта.</span>
           </p>
@@ -171,7 +173,7 @@ export default function Index() {
 
           <div className="grid grid-cols-3 gap-4 mt-16 animate-fade-up delay-400">
             {[
-              { val: "14+", label: "Возраст участия" },
+              { val: "500+", label: "Тестировщиков" },
               { val: "50+", label: "Банков-партнёров" },
               { val: "3 000₽", label: "Средний бонус" },
             ].map((s) => (
@@ -209,9 +211,8 @@ export default function Index() {
                 <Icon name="Building2" size={22} className="text-blue-400" />
               </div>
               <p className="text-slate-300 leading-relaxed font-ibm">
-                Банки активно выпускают карты для аудитории{" "}
-                <strong className="text-white">14–18 лет</strong>, но взрослый человек не может
-                протестировать такой продукт.
+                Банки постоянно обновляют карты, приложения и сервисы доставки. Но оценить их качество
+                изнутри может только <strong className="text-white">реальный клиент</strong>.
               </p>
             </div>
 
@@ -224,7 +225,7 @@ export default function Index() {
               </div>
               <p className="text-slate-300 leading-relaxed font-ibm">
                 Мы — независимое агентство контроля качества (QA). Наша задача: проверять, как банки
-                обслуживают молодёжь в регионах.
+                обслуживают клиентов по всей России.
               </p>
             </div>
 
@@ -241,7 +242,7 @@ export default function Index() {
                     Нам нужны реальные отзывы от реальных людей
                   </h3>
                   <p className="text-slate-400 font-ibm leading-relaxed">
-                    Только живой участник аудитории 14+ может дать честную оценку продукту. Твой опыт
+                    Только реальный человек может дать честную оценку продукту. Твой отзыв
                     буквально влияет на то, как банки улучшают свои сервисы.
                   </p>
                 </div>
@@ -703,7 +704,7 @@ export default function Index() {
             <span className="font-golos font-bold text-white text-sm">QA-Agency</span>
           </div>
           <p className="text-slate-600 font-ibm text-xs text-center">
-            © 2026 QA-Agency · Независимое агентство контроля качества · Только 14+
+            © 2026 QA-Agency · Независимое агентство контроля качества
           </p>
           <div className="badge-qa px-3 py-1 rounded-full text-xs">Официальный набор</div>
         </div>

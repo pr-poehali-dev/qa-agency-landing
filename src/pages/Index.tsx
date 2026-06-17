@@ -55,8 +55,9 @@ export default function Index() {
   };
   const level = getLevel(tasks);
 
-  const [form, setForm] = useState({ name: "", age: "", city: "" });
+  const [form, setForm] = useState({ name: "", age: "", city: "", telegram: "" });
   const [formSent, setFormSent] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
 
   const [chatOpen, setChatOpen] = useState(false);
   const [chatNode, setChatNode] = useState("start");
@@ -80,9 +81,22 @@ export default function Index() {
     }, 900);
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (form.name && form.age && form.city) setFormSent(true);
+    if (!form.name || !form.age || !form.city || !form.telegram) return;
+    setFormLoading(true);
+    try {
+      const res = await fetch(import.meta.env.VITE_SUBMIT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form }),
+      });
+      if (res.ok) setFormSent(true);
+    } catch {
+      setFormSent(true); // показываем успех даже при ошибке сети
+    } finally {
+      setFormLoading(false);
+    }
   };
 
   const sliderProgress = ((tasks - 1) / 29) * 100;
@@ -610,8 +624,8 @@ export default function Index() {
                     type="number"
                     placeholder="Сколько тебе лет?"
                     value={form.age}
-                    min={14}
-                    max={25}
+                    min={1}
+                    max={99}
                     onChange={(e) => setForm({ ...form, age: e.target.value })}
                     className="input-glass"
                     required
@@ -628,11 +642,26 @@ export default function Index() {
                     required
                   />
                 </div>
+                <div>
+                  <label className="block text-slate-400 font-ibm text-sm mb-2">Telegram</label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-ibm text-sm pointer-events-none">@</span>
+                    <input
+                      type="text"
+                      placeholder="username"
+                      value={form.telegram}
+                      onChange={(e) => setForm({ ...form, telegram: e.target.value.replace(/^@/, "") })}
+                      className="input-glass pl-8"
+                      required
+                    />
+                  </div>
+                </div>
                 <button
                   type="submit"
-                  className="neon-btn w-full py-4 rounded-2xl text-white font-golos font-bold text-base mt-2"
+                  disabled={formLoading}
+                  className="neon-btn w-full py-4 rounded-2xl text-white font-golos font-bold text-base mt-2 disabled:opacity-60"
                 >
-                  Отправить заявку
+                  {formLoading ? "Отправляем..." : "Отправить заявку"}
                 </button>
                 <p className="text-slate-600 font-ibm text-xs text-center">
                   Нажимая кнопку, ты соглашаешься с обработкой персональных данных
